@@ -1,0 +1,17 @@
+
+# Django
+*.pyc
+__pycache__
+venv/
+.env
+db.sqlite3
+
+# Next.js
+.next/
+node_modules/
+
+# Flutter
+/build/
+.dart_tool/
+.packages
+.flutter-plugins
