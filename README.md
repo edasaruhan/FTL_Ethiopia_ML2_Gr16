@@ -24,3 +24,9 @@ A comprehensive solution for automated malaria detection using AI, featuring:
 git clone https://github.com/edasaruhan/FTL_Ethiopia_ML2_Gr16.git
 cd FTL_Ethiopia_ML2_Gr16
 # See individual READMEs in backend/, frontend/, mobile/
+```
+## Group Members 
+- **Abel Mekonn**: 
+- **Delina Mulubrhan**: @delinaa16
+- **Zelalem Abera**: @zolamars
+- **Zelalem Wubet**: @zol23-g
