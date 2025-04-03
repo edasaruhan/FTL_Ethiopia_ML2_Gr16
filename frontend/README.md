@@ -1,6 +1,3 @@
-
----
-
 ### **Frontend (Next.js)**
 ```markdown
 # Malaria Diagnosis Dashboard
