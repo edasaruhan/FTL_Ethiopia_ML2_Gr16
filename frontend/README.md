@@ -15,9 +15,7 @@ Next.js web application for healthcare providers to manage malaria diagnosis res
 | Framework      | Next.js 14 (App Router)      |
 | UI Library     | React 18                     |
 | Styling        | Tailwind CSS                 |
-| Data Viz       | Chart.js                     |
-| State Mgmt     | Zustand                      |
-| HTTP Client    | Axios                        |
+
 
 ## 🚀 Quick Start
 
