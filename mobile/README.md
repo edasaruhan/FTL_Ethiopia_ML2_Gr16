@@ -10,17 +10,6 @@ Flutter application for field-based malaria diagnosis using AI-powered blood sme
 - **Offline Support** - Core functionality available without internet
 - **Multi-platform** - Supports both Android and iOS devices
 
-## 🛠 Tech Stack
-| Category          | Technologies/Packages       |
-|--------------------|-----------------------------|
-| Framework         | Flutter 3.13                |
-| Language          | Dart 3.1                    |
-| Machine Learning  | TensorFlow Lite (tflite_flutter) |
-| Camera            | camera 0.10.0+              |
-| State Management  | Riverpod 2.4.7              |
-| Navigation        | GoRouter 10.1.2             |
-| Local Storage     | Hive 2.2.3                  |
-| HTTP Client       | Dio 5.3.3                   |
 
 ## 🚀 Getting Started
 
@@ -33,7 +22,7 @@ Flutter application for field-based malaria diagnosis using AI-powered blood sme
 ### Installation
 ```bash
 # Clone the repository (if not already done)
-git clone https://github.com/your-repo/malaria-diagnosis-system.git
+git clone https://github.com/edasaruhan/FTL_Ethiopia_ML2_Gr16.git
 cd mobile
 
 # Install dependencies
