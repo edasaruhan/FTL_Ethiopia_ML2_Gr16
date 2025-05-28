@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Screening
 from .serializers import ScreeningSerializer
-
+from rest_framework.views import APIView
 class ScreeningViewSet(viewsets.ModelViewSet):
     queryset = Screening.objects.all()
     serializer_class = ScreeningSerializer
@@ -24,5 +24,18 @@ class ScreeningViewSet(viewsets.ModelViewSet):
                 'confidence': 0.96
             }
             serializer.save(**mock_result)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ScreeningUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    
+    def post(self, request):
+        serializer = ScreeningSerializer(data=request.data)
+        if serializer.is_valid():
+            # In production, add your ML model processing here
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
