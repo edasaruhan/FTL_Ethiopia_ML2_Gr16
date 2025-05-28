@@ -1,21 +1,28 @@
 // app/dashboard/page.js
 'use client'
-import { Grid } from '@mui/material'
+import { Grid, Box } from '@mui/material'
 import PatientTable from '@/components/PatientTable'
 import ScreeningStats from '@/components/ScreeningStats'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import PatientForm from '@/components/PatientForm'
 
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <ScreeningStats />
+      <Box sx={{ pl:30, width: { sm: `calc(100% - 240px)` }, mt: '64px' }}> {/* Adjust for navbar height */}
+        <Grid >
+         
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            <ScreeningStats />
+          </Grid>
+           <Grid container spacing={3} sx={{ mb: 3 }}>
+            <PatientForm />
+          </Grid>
+          <Grid >
+            <PatientTable />
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <PatientTable />
-        </Grid>
-      </Grid>
+      </Box>
     </ProtectedRoute>
   )
 }
