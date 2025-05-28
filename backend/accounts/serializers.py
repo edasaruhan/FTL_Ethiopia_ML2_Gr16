@@ -1,14 +1,16 @@
-#  backend/accounts/serializers.py
+# backend/accounts/serializers.py
 from rest_framework import serializers
-from .models import CustomUser
+from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+User = get_user_model()
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('id', 'email', 'user_type', 'phone')
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
