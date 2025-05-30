@@ -5,6 +5,7 @@ __pycache__
 venv/
 .env
 db.sqlite3
+media/
 
 # Next.js
 .next/
@@ -15,3 +16,7 @@ node_modules/
 .dart_tool/
 .packages
 .flutter-plugins
+
+#model_training
+venv310/
+dataset/
