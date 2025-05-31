@@ -106,9 +106,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME", "malaria_db"),
         "USER": os.getenv("DB_USER", "malaria_user"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "your_secure_password"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST" ),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 

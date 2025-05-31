@@ -2,8 +2,8 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  Button,
+import {
+  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -11,8 +11,11 @@ import {
   TextField,
   Typography,
   CircularProgress,
-  Box
+  Box,
+  Button,
+  Tooltip,
 } from '@mui/material'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import api from '@/lib/api'
 
 export default function ScreeningUpload({ patientId }) {
@@ -27,8 +30,7 @@ export default function ScreeningUpload({ patientId }) {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
     setFile(selectedFile)
-    
-    // Create preview
+
     const reader = new FileReader()
     reader.onloadend = () => {
       setPreview(reader.result)
@@ -38,20 +40,20 @@ export default function ScreeningUpload({ patientId }) {
 
   const handleSubmit = async () => {
     if (!file || !patientId) return
-    
+
     setLoading(true)
     setError(null)
-    
+
     const formData = new FormData()
     formData.append('image', file)
     formData.append('patient', patientId)
     formData.append('notes', notes)
-    
+
     try {
       await api.post('/screenings/upload/', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
       router.refresh()
       handleClose()
@@ -72,15 +74,23 @@ export default function ScreeningUpload({ patientId }) {
 
   return (
     <>
-      <Button 
-        variant="contained" 
-        onClick={() => setOpen(true)}
-        sx={{ ml: 2 }}
+      <Tooltip title="Upload Screening">
+        <IconButton
+          color="primary"
+          onClick={() => setOpen(true)}
+          sx={{ ml: 1 }}
+        >
+          <CloudUploadIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="lg" // << made larger
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+        fullWidth
       >
-        Upload Screening
-      </Button>
-      
-      <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>Upload Blood Smear Image</DialogTitle>
         <DialogContent>
           {error && (
@@ -88,54 +98,63 @@ export default function ScreeningUpload({ patientId }) {
               {typeof error === 'object' ? JSON.stringify(error) : error}
             </Typography>
           )}
-          
-          <Box sx={{ display: 'flex', gap: 3, mt: 2 }}>
-            <Box sx={{ flex: 1 }}>
+
+          <Box sx={{ display: 'flex', gap: 4, mt: 2, flexWrap: 'wrap' }}>
+            {/* Image preview + upload */}
+            <Box sx={{ flex: 1, minWidth: 300 }}>
               <input
                 accept="image/*"
                 style={{ display: 'none' }}
-                id="screening-upload"
+                id={`screening-upload-${patientId}`}
                 type="file"
                 onChange={handleFileChange}
               />
-              <label htmlFor="screening-upload">
-                <Button 
-                  variant="contained" 
-                  component="span"
-                  fullWidth
-                >
+              <label htmlFor={`screening-upload-${patientId}`}>
+                <Button variant="outlined" component="span" fullWidth>
                   Select Image
                 </Button>
               </label>
-              
+
               {preview && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2">Preview:</Typography>
-                  <img 
-                    src={preview} 
-                    alt="Preview" 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: 300,
-                      marginTop: 8,
-                      border: '1px solid #ddd'
-                    }} 
+                <Box
+                  sx={{
+                    mt: 2,
+                    border: '1px solid #ddd',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    maxHeight: 400, // << bigger preview
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                    Preview:
+                  </Typography>
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '350px', // << bigger height
+                      display: 'block',
+                      margin: '0 auto',
+                    }}
                   />
                 </Box>
               )}
             </Box>
-            
-            <Box sx={{ flex: 1 }}>
+
+            {/* Notes area */}
+            <Box sx={{ flex: 1, minWidth: 300 }}>
               <TextField
                 label="Notes"
                 fullWidth
                 multiline
-                rows={4}
+                rows={10} // << taller note box
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 sx={{ mb: 2 }}
               />
-              
+
               <Typography variant="body2" color="text.secondary">
                 Patient ID: {patientId}
               </Typography>
@@ -144,12 +163,12 @@ export default function ScreeningUpload({ patientId }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             variant="contained"
             disabled={!file || loading}
           >
-            {loading ? <CircularProgress size={24} /> : 'Upload'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Upload'}
           </Button>
         </DialogActions>
       </Dialog>
