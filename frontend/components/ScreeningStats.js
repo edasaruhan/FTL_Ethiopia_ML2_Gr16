@@ -38,7 +38,7 @@ export default function ScreeningStats() {
   ]
 
   return (
-    <Grid container spacing={4}>
+    <Grid container spacing={8}>
       {stats.map((stat, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
           <Card
@@ -46,7 +46,7 @@ export default function ScreeningStats() {
             sx={{
               borderLeft: 6,
               borderColor: stat.color,
-              height: 150,               // taller card
+              height: 200,               // taller card
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',  // center content vertically
