@@ -5,31 +5,20 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Screening
-from .serializers import ScreeningSerializer
+from .serializers import ScreeningGetSerializer, ScreeningSerializer
 from rest_framework.views import APIView
+from rest_framework import viewsets, permissions
 
 import tensorflow as tf
 from PIL import Image
 import numpy as np
-class ScreeningViewSet(viewsets.ModelViewSet):
-    queryset = Screening.objects.all()
-    serializer_class = ScreeningSerializer
-    parser_classes = [MultiPartParser, FormParser]
-    
-    @action(detail=False, methods=['post'])
-    def upload(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            # In a real implementation, you would call your ML model here
-            # For now, we'll mock the response
-            mock_result = {
-                'result': 'P',
-                'parasite_count': 42,
-                'confidence': 0.96
-            }
-            serializer.save(**mock_result)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to list all screenings or retrieve a single screening.
+    """
+    queryset = Screening.objects.select_related('patient').all().order_by('-created_at')
+    serializer_class = ScreeningGetSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 
@@ -65,7 +54,7 @@ class ScreeningUploadView(APIView):
             output_data = interpreter.get_tensor(output_details[0]['index'])[0][0]
 
             prediction = output_data
-            result = 'P' if prediction > 0.5 else 'N'
+            result = 'N' if prediction > 0.5 else 'P'
             confidence = float(prediction if prediction > 0.5 else 1 - prediction)
             parasite_count = int(confidence * 100)  # Example scaling logic
 

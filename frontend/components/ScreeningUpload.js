@@ -14,6 +14,7 @@ import {
   Box,
   Button,
   Tooltip,
+  Alert,
 } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import api from '@/lib/api'
@@ -25,6 +26,8 @@ export default function ScreeningUpload({ patientId }) {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [resultMessage, setResultMessage] = useState(null)
+  const [confidence, setConfidence] = useState(null)
   const router = useRouter()
 
   const handleFileChange = (e) => {
@@ -43,6 +46,8 @@ export default function ScreeningUpload({ patientId }) {
 
     setLoading(true)
     setError(null)
+    setResultMessage(null)
+    setConfidence(null)
 
     const formData = new FormData()
     formData.append('image', file)
@@ -50,13 +55,28 @@ export default function ScreeningUpload({ patientId }) {
     formData.append('notes', notes)
 
     try {
-      await api.post('/screenings/upload/', formData, {
+      const response = await api.post('/screenings/upload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
+
+      const result = response.data?.result
+      const confidenceValue = response.data?.confidence
+
+      if (result === 'P') {
+        setResultMessage('⚠ Malaria Detected (Positive)')
+      } else if (result === 'N') {
+        setResultMessage('✅ No Malaria Detected (Negative)')
+      } else {
+        setResultMessage('Result unclear, please review.')
+      }
+
+      if (confidenceValue !== undefined) {
+        setConfidence((confidenceValue * 100).toFixed(1)) // e.g., 0.87 → 87.0%
+      }
+
       router.refresh()
-      handleClose()
     } catch (err) {
       setError(err.response?.data || 'Upload failed')
     } finally {
@@ -70,6 +90,8 @@ export default function ScreeningUpload({ patientId }) {
     setPreview(null)
     setNotes('')
     setError(null)
+    setResultMessage(null)
+    setConfidence(null)
   }
 
   return (
@@ -87,7 +109,7 @@ export default function ScreeningUpload({ patientId }) {
       <Dialog
         open={open}
         onClose={handleClose}
-        maxWidth="lg" // << made larger
+        maxWidth="lg"
         PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
         fullWidth
       >
@@ -99,8 +121,30 @@ export default function ScreeningUpload({ patientId }) {
             </Typography>
           )}
 
+          {resultMessage && (
+            <Alert
+              severity={resultMessage.includes('Malaria') ? 'error' : 'success'}
+              sx={{
+                mb: 2,
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                py: 2,
+              }}
+            >
+              {resultMessage}
+              {confidence !== null && (
+                <Typography
+                  variant="h6"
+                  sx={{ mt: 1, fontWeight: 'normal' }}
+                >
+                  Confidence: {confidence}%
+                </Typography>
+              )}
+            </Alert>
+          )}
+
           <Box sx={{ display: 'flex', gap: 4, mt: 2, flexWrap: 'wrap' }}>
-            {/* Image preview + upload */}
             <Box sx={{ flex: 1, minWidth: 300 }}>
               <input
                 accept="image/*"
@@ -122,11 +166,11 @@ export default function ScreeningUpload({ patientId }) {
                     border: '1px solid #ddd',
                     borderRadius: 2,
                     overflow: 'hidden',
-                    maxHeight: 400, // << bigger preview
+                    maxHeight: 500, // bigger preview
                     textAlign: 'center',
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                  <Typography variant="subtitle1" sx={{ mt: 1 }}>
                     Preview:
                   </Typography>
                   <img
@@ -134,7 +178,7 @@ export default function ScreeningUpload({ patientId }) {
                     alt="Preview"
                     style={{
                       maxWidth: '100%',
-                      maxHeight: '350px', // << bigger height
+                      maxHeight: '450px', // bigger height
                       display: 'block',
                       margin: '0 auto',
                     }}
@@ -143,13 +187,12 @@ export default function ScreeningUpload({ patientId }) {
               )}
             </Box>
 
-            {/* Notes area */}
             <Box sx={{ flex: 1, minWidth: 300 }}>
               <TextField
                 label="Notes"
                 fullWidth
                 multiline
-                rows={10} // << taller note box
+                rows={10}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 sx={{ mb: 2 }}
@@ -162,7 +205,7 @@ export default function ScreeningUpload({ patientId }) {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Close</Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
