@@ -6,27 +6,24 @@ import { Box, CssBaseline, Toolbar } from '@mui/material'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 
+const drawerWidth = 240
+
 export default function DashboardLayout({ children }) {
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
-  }
-
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
-      <Navbar onDrawerToggle={handleDrawerToggle} />
-      <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
+      <Navbar />
+      <Sidebar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          px:10,
-          width: { sm: `calc(100% - 240px)` },
-          mt: '64px', // height of navbar
+          p: { xs: 2, sm: 3 },
+          width: { sm: `calc(100% - ${drawerWidth}px)` }, // account for sidebar
+          ml: { sm: `${drawerWidth}px` }, // shift main to the right
         }}
       >
+        <Toolbar /> {/* push content below navbar */}
         {children}
       </Box>
     </Box>

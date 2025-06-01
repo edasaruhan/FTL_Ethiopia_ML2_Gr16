@@ -10,6 +10,8 @@ import {
   Divider,
 } from '@mui/material'
 import InboxIcon from '@mui/icons-material/Inbox'
+import AssessmentIcon from '@mui/icons-material/Assessment'
+import Link from 'next/link'
 
 const drawerWidth = 240
 
@@ -19,13 +21,23 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }) {
       <Toolbar />
       <Divider />
       <List>
-        <ListItem button>
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
-          <ListItemText primary="Patients" />
-        </ListItem>
-        {/* Add more items here */}
+        <Link href="/dashboard" passHref legacyBehavior>
+          <ListItem button component="a">
+            <ListItemIcon>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText primary="Patients" />
+          </ListItem>
+        </Link>
+
+        <Link href="/dashboard/screenings" passHref legacyBehavior>
+          <ListItem button component="a">
+            <ListItemIcon>
+              <AssessmentIcon />
+            </ListItemIcon>
+            <ListItemText primary="Screenings" />
+          </ListItem>
+        </Link>
       </List>
     </>
   )
@@ -37,9 +49,7 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }) {
         variant="temporary"
         open={mobileOpen}
         onClose={onDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // better mobile performance
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', sm: 'none' },
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },

@@ -9,7 +9,7 @@ import PatientForm from '@/components/PatientForm'
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <Box sx={{ pl:30, width: { sm: `calc(100% - 240px)` }, mt: '64px' }}> {/* Adjust for navbar height */}
+      <Box sx={{  width: { sm: `calc(100% - 240px)` }, mt: '64px' }}> 
         <Grid >
          
           <Grid container spacing={3} sx={{ mb: 3 }}>
