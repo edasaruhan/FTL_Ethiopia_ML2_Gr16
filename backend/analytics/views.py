@@ -3,14 +3,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from screenings.models import Screening
-from django.db.models import Count
+from patients.models import Patient  
 from datetime import date, timedelta
 
 class DashboardView(APIView):
     def get(self, request):
+        total_screenings = Screening.objects.count()
         stats = {
             'today_cases': Screening.objects.filter(created_at__date=date.today()).count(),
-            'positive_rate': Screening.objects.filter(result='P').count() / Screening.objects.count() if Screening.objects.count() > 0 else 0,
+            'positive_rate': Screening.objects.filter(result='P').count() / total_screenings if total_screenings > 0 else 0,
+            'total_patients': Patient.objects.count(),  
             'weekly_trend': self.get_weekly_trend()
         }
         return Response(stats)

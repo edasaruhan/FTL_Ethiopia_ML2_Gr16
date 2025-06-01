@@ -9,10 +9,10 @@ import PatientForm from '@/components/PatientForm'
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <Box sx={{  width: { sm: `calc(100% - 240px)` }, mt: '64px' }}> 
+      <Box sx={{  mt: '6px' }}> 
         <Grid >
          
-          <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid container spacing={4} sx={{ mb: 3 }}>
             <ScreeningStats />
           </Grid>
            <Grid container spacing={3} sx={{ mb: 3 }}>
