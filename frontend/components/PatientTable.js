@@ -30,7 +30,7 @@ export default function PatientTable() {
   })
 
   const handleView = (id) => {
-    router.push(`/patients/${id}`)  // adjust route as needed
+    router.push(`/dashboard/patients/${id}`)  // adjust route as needed
   }
 
   const handleDelete = (id) => {
