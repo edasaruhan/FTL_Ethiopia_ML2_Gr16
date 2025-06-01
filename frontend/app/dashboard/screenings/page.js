@@ -7,14 +7,44 @@ import {
   Chip,
   Box,
   Typography,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid' // Ensure this import is included
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function ScreeningTablePage() {
+  const router = useRouter()
+  const queryClient = useQueryClient()
+
   const { data, isLoading } = useQuery({
     queryKey: ['screenings'],
     queryFn: () => api.get('/screenings/screenings/').then(res => res.data),
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => api.delete(`/screenings/screenings/${id}/`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['screenings'])
+      alert('Screening deleted successfully.')
+    },
+    onError: () => {
+      alert('Failed to delete screening.')
+    },
+  })
+
+  const handleView = (id) => {
+    router.push(`/dashboard/screenings/${id}`)  // adjust route as needed
+  }
+
+  const handleDelete = (id) => {
+    if (confirm('Are you sure you want to delete this screening?')) {
+      deleteMutation.mutate(id)
+    }
+  }
 
   const columns = [
     {
@@ -67,6 +97,28 @@ export default function ScreeningTablePage() {
         const date = params.row.created_at ? new Date(params.row.created_at) : null;
         return <span>{date ? date.toLocaleString() : 'Unknown'}</span>;
       },
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title="View Screening">
+            <IconButton color="primary" onClick={() => handleView(params.row.id)}>
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Delete Screening">
+            <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
     },
   ]
 

@@ -40,7 +40,12 @@ export default function PatientTable() {
   }
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+     {
+      field: 'id',
+      headerName: 'Patient ID',
+      width: 100,
+      renderCell: (params) => `PID-${params.row.id}`, // Format the ID
+    },
     { field: 'first_name', headerName: 'First Name', flex: 1 },
     { field: 'last_name', headerName: 'Last Name', flex: 1 },
     { field: 'gender', headerName: 'Gender', width: 100 },
