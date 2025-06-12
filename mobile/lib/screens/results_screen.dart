@@ -1,23 +1,29 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malaria_screener/database/db_helper.dart';
+import 'package:intl/intl.dart';
 
 class ResultScreen extends StatelessWidget {
-  final String imagePath; // Path of the captured image
-  final int infectedCount; // Number of infected RBCs
-  final int totalCount; // Total number of RBCs
+  final String imagePath;
+  final String resultText;
+
+  final String patientName;
+  final int patientId;
 
   ResultScreen({
     required this.imagePath,
-    required this.infectedCount,
-    required this.totalCount,
+    required this.resultText,
+    required this.patientName,
+    required this.patientId,
   });
 
   @override
   Widget build(BuildContext context) {
     final file = File(imagePath);
+    final isInfected = resultText.toLowerCase().contains('parasitized');
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd – HH:mm').format(now);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,63 +32,79 @@ class ResultScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
-            // Display the captured image
+            // Enlarged Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: file.existsSync()
-                  ? Image.file(file, height: 200, width: double.infinity, fit: BoxFit.cover)
-                  : Image.asset('assets/placeholder.png', height: 200, width: double.infinity, fit: BoxFit.cover),
+                  ? Image.file(file, height: 300, width: double.infinity, fit: BoxFit.cover)
+                  : Image.asset('assets/placeholder.png', height: 300, width: double.infinity, fit: BoxFit.cover),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24),
 
-            // Display the analysis results
             Text(
-              'Analysis Results',
-              style: GoogleFonts.lato(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.teal.shade800,
-              ),
+              'Analysis Result',
+              style: GoogleFonts.lato(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal.shade800),
             ),
-            SizedBox(height: 10),
-            Text(
-              'Infected RBCs: $infectedCount',
-              style: GoogleFonts.lato(fontSize: 18),
-            ),
-            Text(
-              'Total RBCs: $totalCount',
-              style: GoogleFonts.lato(fontSize: 18),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 12),
 
-            // Save Results Button
+            Row(
+              children: [
+                Icon(
+                  isInfected ? Icons.warning_amber_rounded : Icons.check_circle_outline,
+                  color: isInfected ? Colors.red : Colors.green,
+                  size: 36,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  resultText,
+                  style: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w600, color: isInfected ? Colors.red : Colors.green),
+                ),
+              ],
+            ),
+            SizedBox(height: 24),
+
+            Divider(),
+
+            // Patient Info
+            Text(
+              'Patient Info',
+              style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('👤     Name: $patientName', style: GoogleFonts.lato(fontSize: 16)),
+            SizedBox(height: 5,),
+            Text('🆔     ID: $patientId', style: GoogleFonts.lato(fontSize: 16)),
+
+            SizedBox(height: 16),
+
+            // Date and Time
+            Text(
+              'Analysis Date & Time',
+              style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('📅     $formattedDate', style: GoogleFonts.lato(fontSize: 16)),
+
+            SizedBox(height: 32),
+
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  // Save results to the database
                   final dbHelper = DatabaseHelper.instance;
-                  final patientId = 2; // Replace with actual patient ID
-                  final slideId = 2; // Replace with actual slide ID
-
                   await dbHelper.insertImage({
                     'patient_id': patientId,
-                    'slide_id': slideId,
-                    'cell_count': totalCount,
-                    'infected_count': infectedCount,
-                    'cell_count_gt': totalCount,
-                    'infected_count_gt': infectedCount,
+                    'slide_id': 2, // You may change or generate slide IDs dynamically
+                    'cell_count': 1,
+                    'infected_count': isInfected ? 1 : 0,
+                    'cell_count_gt': 1,
+                    'infected_count_gt': isInfected ? 1 : 0,
                   });
 
-                  // Navigate back to the home screen
                   Navigator.pop(context);
                 },
-                child: Text(
-                  'Save Results',
-                  style: GoogleFonts.lato(fontSize: 18),
-                ),
+                child: Text('Save Results', style: GoogleFonts.lato(fontSize: 18)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orangeAccent,
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
