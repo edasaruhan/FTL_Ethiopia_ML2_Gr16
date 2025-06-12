@@ -20,6 +20,12 @@ class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ScreeningGetSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=False, methods=['get'], url_path='patient/(?P<patient_id>[^/.]+)')
+    def screenings_by_patient(self, request, patient_id=None):
+        screenings = Screening.objects.filter(patient_id=patient_id).order_by('-created_at')
+        serializer = self.get_serializer(screenings, many=True)
+        return Response(serializer.data)
+
 
 
 

@@ -108,7 +108,7 @@ export default function PatientForm() {
             >
               <MenuItem value="M">Male</MenuItem>
               <MenuItem value="F">Female</MenuItem>
-              <MenuItem value="O">Other</MenuItem>
+              {/* <MenuItem value="O">Other</MenuItem> */}
             </TextField>
             <TextField
               name="birth_date"

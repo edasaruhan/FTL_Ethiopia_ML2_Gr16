@@ -3,7 +3,17 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/api'
 import { useParams } from 'next/navigation'
-import { Box, Typography, Paper, List, ListItem, ListItemText, Divider, Grid, Avatar, Card, CardContent } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Grid,
+  Avatar,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  Paper,
+} from '@mui/material'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function PatientDetailPage() {
@@ -16,7 +26,7 @@ export default function PatientDetailPage() {
 
   const { data: screeningsData, isLoading: screeningsLoading } = useQuery({
     queryKey: ['screenings', id],
-    queryFn: () => api.get(`/screenings/screenings/?patient=${id}`).then(res => res.data),
+    queryFn: () => api.get(`/screenings/screenings/patient/${id}/`).then(res => res.data),
   })
 
   if (isLoading) return <Typography sx={{ p: 3 }}>Loading patient details...</Typography>
@@ -26,72 +36,82 @@ export default function PatientDetailPage() {
     <ProtectedRoute>
       <Box sx={{ p: 3, width: '100%' }}>
         <Grid container spacing={3}>
-          {/* Patient Details */}
+          {/* Patient Details Card */}
           <Grid item xs={12}>
-            <Paper elevation={4} sx={{ p: 3 }}>
+            <Card elevation={6} sx={{ p: 3 }}>
               <Typography variant="h4" gutterBottom>
                 {data.first_name} {data.last_name}
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Gender: {data.gender === 'M' ? 'Male' : 'Female'}
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Birth Date: {new Date(data.birth_date).toLocaleDateString()}
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Address: {data.address}
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Phone: {data.phone}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Record Created At: {new Date(data.created_at).toLocaleString()}
-              </Typography>
-            </Paper>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Gender:</strong> {data.gender === 'M' ? 'Male' : 'Female'}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Birth Date:</strong> {new Date(data.birth_date).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Phone:</strong> {data.phone}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Address:</strong> {data.address}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Record Created At: {new Date(data.created_at).toLocaleString()}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Card>
           </Grid>
 
-          {/* Screening Records */}
+          {/* Screening Records Section */}
           <Grid item xs={12}>
-            <Paper elevation={4} sx={{ p: 3 }}>
-              <Typography variant="h5" gutterBottom>
-                Screening Records
-              </Typography>
-
+            <Typography variant="h5" gutterBottom>
+              Screening Records
+            </Typography>
+            <Grid container spacing={3}>
               {screeningsLoading ? (
-                <Typography>Loading screenings...</Typography>
+                <Typography sx={{ p: 2 }}>Loading screenings...</Typography>
               ) : screeningsData?.length > 0 ? (
-                <List>
-                  {screeningsData.map((screening) => (
-                    <ListItem key={screening.id} sx={{ mb: 2 }}>
-                      <Card variant="outlined" sx={{ display: 'flex', width: '100%' }}>
-                        <Avatar
-                          variant="rounded"
-                          src={screening.image}
-                          alt="Screening Image"
-                          sx={{ width: 100, height: 100, mr: 2 }}
-                        />
-                        <CardContent sx={{ flex: 1 }}>
-                          <Typography variant="h6" component="div">
-                            Result: {screening.result === 'P' ? 'Positive' : 'Negative'} ({(screening.confidence * 100).toFixed(1)}% confidence)
+                screeningsData.map((screening) => (
+                  <Grid item xs={12} sm={6} md={4} key={screening.id}>
+                    <Card elevation={4} sx={{ height: '100%' }}>
+                      <CardMedia
+                        component="img"
+                        height="180"
+                        image={screening.image}
+                        alt="Screening"
+                      />
+                      <CardContent>
+                        <Box sx={{ mb: 1 }}>
+                          <Chip
+                            label={screening.result === 'P' ? 'Positive' : 'Negative'}
+                            color={screening.result === 'P' ? 'error' : 'success'}
+                            size="small"
+                          />
+                          <Typography variant="body2" sx={{ ml: 1 }}>
+                            {screening.confidence ? `${(screening.confidence * 100).toFixed(1)}% confidence` : ''}
                           </Typography>
-                          <Typography variant="body2" color="text.primary">
-                            Parasite Count: {screening.parasite_count}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Notes: {screening.notes || 'No notes provided'}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Date: {new Date(screening.created_at).toLocaleString()}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </ListItem>
-                  ))}
-                </List>
+                        </Box>
+                        <Typography variant="body2">
+                          <strong>Parasite Count:</strong> {screening.parasite_count}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          <strong>Notes:</strong> {screening.notes || 'No notes provided'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                          Date: {new Date(screening.created_at).toLocaleString()}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
               ) : (
-                <Typography>No screenings available for this patient.</Typography>
+                <Typography sx={{ p: 2 }}>No screenings available for this patient.</Typography>
               )}
-            </Paper>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
