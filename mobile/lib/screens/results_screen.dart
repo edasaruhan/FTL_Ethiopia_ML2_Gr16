@@ -7,13 +7,14 @@ import 'package:intl/intl.dart';
 class ResultScreen extends StatelessWidget {
   final String imagePath;
   final String resultText;
-
+  final String confidence; // percentage as string e.g., "87.25"
   final String patientName;
   final int patientId;
 
   ResultScreen({
     required this.imagePath,
     required this.resultText,
+    required this.confidence,
     required this.patientName,
     required this.patientId,
   });
@@ -57,9 +58,18 @@ class ResultScreen extends StatelessWidget {
                   size: 36,
                 ),
                 SizedBox(width: 12),
-                Text(
-                  resultText,
-                  style: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w600, color: isInfected ? Colors.red : Colors.green),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      resultText,
+                      style: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w600, color: isInfected ? Colors.red : Colors.green),
+                    ),
+                    Text(
+                      'Confidence: $confidence%',
+                      style: GoogleFonts.lato(fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -74,7 +84,7 @@ class ResultScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text('👤     Name: $patientName', style: GoogleFonts.lato(fontSize: 16)),
-            SizedBox(height: 5,),
+            SizedBox(height: 5),
             Text('🆔     ID: $patientId', style: GoogleFonts.lato(fontSize: 16)),
 
             SizedBox(height: 16),
@@ -95,7 +105,7 @@ class ResultScreen extends StatelessWidget {
                   final dbHelper = DatabaseHelper.instance;
                   await dbHelper.insertImage({
                     'patient_id': patientId,
-                    'slide_id': 2, // You may change or generate slide IDs dynamically
+                    'slide_id': 2,
                     'cell_count': 1,
                     'infected_count': isInfected ? 1 : 0,
                     'cell_count_gt': 1,
