@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:malaria_screener/screens/results_screen.dart';
-
 import '../utils/classifier.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -38,29 +36,28 @@ class _CameraScreenState extends State<CameraScreen> {
           ? CameraPreview(_controller!)
           : Center(child: CircularProgressIndicator()),
       floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final image = await _controller?.takePicture();
-            if (image != null) {
-              final classifier = Classifier();
-              final result = await classifier.predict(File(image.path));
+        onPressed: () async {
+          final image = await _controller?.takePicture();
+          if (image != null) {
+            final classifier = Classifier();
+            await classifier.loadModel();
+            final result = await classifier.predict(File(image.path));
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultScreen(
-                    imagePath: image.path,
-                    resultText: result,
-                    patientName: 'Sara Noah', // Replace with real patient name if available
-                    patientId: 2,          // Replace with actual patient ID
-                  ),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(
+                  imagePath: image.path,
+                  resultText: result['label'],
+                  confidence: result['confidence'],
+                  patientName: 'Sara Noah',
+                  patientId: 2,
                 ),
-              );
-
-
-            }
-          },
-
-          child: Icon(Icons.camera_alt),
+              ),
+            );
+          }
+        },
+        child: Icon(Icons.camera_alt),
       ),
     );
   }

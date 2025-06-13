@@ -37,6 +37,7 @@ class MalariaScreenerApp extends StatelessWidget {
         '/results': (context) => ResultScreen(
           imagePath: '',
           resultText: '',
+          confidence: '0.0',
           patientName: 'Demo Patient',
           patientId: 2,
         ),
