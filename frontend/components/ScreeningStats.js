@@ -2,6 +2,7 @@
 'use client'
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { Bar } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -33,8 +34,8 @@ export default function ScreeningStats() {
   // Animate counters
   useEffect(() => {
     if (data) {
-      const duration = 1000
-      const steps = 30
+      const duration = 1500 // Smoother animation
+      const steps = 50 // More steps for fluidity
       const interval = duration / steps
       let currentStep = 0
 
@@ -70,9 +71,32 @@ export default function ScreeningStats() {
     }
   }, [data])
 
+  // Animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  }
+
+  if (isLoading) {
+    return (
+      <Typography
+        variant="body1"
+        sx={{ color: '#4b5e5a', textAlign: 'center' }}
+        className="font-sans"
+      >
+        Loading statistics...
+      </Typography>
+    )
+  }
+
   if (error) {
     return (
-      <Typography color="error" variant="body1">
+      <Typography
+        color="error"
+        variant="body1"
+        sx={{ bgcolor: '#ffebee', p: 2, borderRadius: '8px', textAlign: 'center' }}
+        className="font-sans"
+      >
         Failed to load statistics: {error.message}
       </Typography>
     )
@@ -82,7 +106,7 @@ export default function ScreeningStats() {
     {
       title: "Today's Screenings",
       value: animatedCounts.today_cases || 0,
-      color: 'primary.main',
+      color: '#00695c', // Teal for consistency
     },
     {
       title: 'Positive Rate',
@@ -90,20 +114,16 @@ export default function ScreeningStats() {
         animatedCounts.positive_rate !== undefined
           ? `${(animatedCounts.positive_rate * 100).toFixed(1)}%`
           : '0%',
-      color: 'error.main',
+      color: '#d32f2f', // Red for emphasis
     },
     {
       title: 'Total Patients',
       value: animatedCounts.total_patients || 0,
-      color: 'success.main',
+      color: '#2e7d32', // Green for success
     },
   ]
 
   const weeklyData = data?.weekly_trend || { dates: [], counts: [] }
-
-  const colors = weeklyData.counts.map((count, idx, arr) =>
-    idx > 0 && count > arr[idx - 1] ? 'green' : 'red'
-  )
 
   const chartData = {
     labels: weeklyData.dates,
@@ -111,65 +131,115 @@ export default function ScreeningStats() {
       {
         label: 'Daily Screenings',
         data: weeklyData.counts,
-        backgroundColor: colors,
+        backgroundColor: weeklyData.counts.map((count, idx, arr) =>
+          idx > 0 && count > arr[idx - 1] ? '#2e7d32' : '#00695c'
+        ),
+        borderColor: '#e6f0fa',
+        borderWidth: 1,
+        borderRadius: 8, // Rounded bars
       },
     ],
   }
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       title: {
         display: true,
         text: 'Weekly Screening Trend',
-        font: { size: 18 },
+        font: { size: 18, family: 'serif' },
+        color: '#1a3c34',
+        padding: { bottom: 20 },
       },
+      tooltip: {
+        backgroundColor: '#1a3c34',
+        titleColor: '#e6f0fa',
+        bodyColor: '#e6f0fa',
+      },
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#4b5e5a' } },
+      y: { grid: { color: '#e6f0fa' }, ticks: { color: '#4b5e5a' } },
     },
     animation: {
       duration: 1000,
     },
   }
-return (
-  <Box>
-    <Grid container spacing={3} alignItems="stretch">
-      {/* Stat Cards - 3 cards × 2 columns = 6 columns */}
-      {stats.map((stat, index) => (
-        <Grid item xs={12} md={2} key={index}>
-          <Card
-            elevation={6}
-            sx={{
-              borderLeft: 6,
-              borderColor: stat.color,
-              height: 220,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              p: 2,
-            }}
-          >
-            <CardContent>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                {stat.title}
-              </Typography>
-              <Typography variant="h3" sx={{ color: stat.color }}>
-                {stat.value}
-              </Typography>
-            </CardContent>
-          </Card>
+
+  return (
+    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: 700, color: '#1a3c34', mb: 3, fontSize: { xs: '1.5rem', sm: '1.8rem' } }}
+        className="font-serif"
+      >
+        Screening Statistics
+      </Typography>
+      <Grid container spacing={3} alignItems="stretch">
+        {stats.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <motion.div variants={cardVariants} initial="hidden" animate="visible">
+              <Card
+                elevation={6}
+                sx={{
+                  borderLeft: 6,
+                  borderColor: stat.color,
+                  height: '100%',
+                  minHeight: 180,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  p: 3,
+                  borderRadius: '12px',
+                  bgcolor: '#ffffff',
+                  transition: 'transform 0.3s',
+                  '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
+                }}
+                className="shadow-md"
+                aria-label={`${stat.title}: ${stat.value}`}
+              >
+                <CardContent>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ color: '#4b5e5a', mb: 1 }}
+                    className="font-sans"
+                  >
+                    {stat.title}
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    sx={{ color: stat.color, fontWeight: 600 }}
+                    className="font-sans"
+                  >
+                    {stat.value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Grid>
+        ))}
+        <Grid item xs={12}>
+          <motion.div variants={cardVariants} initial="hidden" animate="visible">
+            <Card
+              elevation={6}
+              sx={{
+                height: 300,
+                p: 3,
+                borderRadius: '12px',
+                bgcolor: '#ffffff',
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
+              }}
+              className="shadow-md"
+              aria-label="Weekly screening trend chart"
+            >
+              <Bar data={chartData} options={chartOptions} />
+            </Card>
+          </motion.div>
         </Grid>
-      ))}
-
-      {/* Chart Card - spans 6 columns */}
-      <Grid item xs={12} md={6}>
-        <Card elevation={4} sx={{ height: 220, p: 2,width: '100%' }}>
-          <Bar data={chartData} options={chartOptions} />
-        </Card>
       </Grid>
-    </Grid>
-  </Box>
-)
-
-
-
+    </Box>
+  )
 }
