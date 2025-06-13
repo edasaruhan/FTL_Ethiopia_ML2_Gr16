@@ -12,8 +12,8 @@ import {
   CardContent,
   CardMedia,
   Chip,
-  Paper,
 } from '@mui/material'
+import { motion } from 'framer-motion'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function PatientDetailPage() {
@@ -29,87 +29,222 @@ export default function PatientDetailPage() {
     queryFn: () => api.get(`/screenings/screenings/patient/${id}/`).then(res => res.data),
   })
 
-  if (isLoading) return <Typography sx={{ p: 3 }}>Loading patient details...</Typography>
-  if (error) return <Typography color="error" sx={{ p: 3 }}>Failed to load patient.</Typography>
+  // Animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  }
+
+  if (isLoading) {
+    return (
+      <Box sx={{ p: { xs: 2, sm: 3 }, textAlign: 'center' }}>
+        <Typography
+          variant="body1"
+          sx={{ color: '#4b5e5a' }}
+          className="font-sans"
+          aria-label="Loading patient details"
+        >
+          Loading patient details...
+        </Typography>
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: { xs: 2, sm: 3 }, textAlign: 'center' }}>
+        <Typography
+          color="error"
+          variant="body1"
+          sx={{ bgcolor: '#ffebee', p: 2, borderRadius: '8px' }}
+          className="font-sans"
+          aria-label="Error loading patient"
+        >
+          Failed to load patient: {error.message}
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <ProtectedRoute>
-      <Box sx={{ p: 3, width: '100%' }}>
+      <Box sx={{ p: { xs: 2, sm: 3 }, width: '100%' }}>
         <Grid container spacing={3}>
           {/* Patient Details Card */}
           <Grid item xs={12}>
-            <Card elevation={6} sx={{ p: 3 }}>
-              <Typography variant="h4" gutterBottom>
-                {data.first_name} {data.last_name}
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Gender:</strong> {data.gender === 'M' ? 'Male' : 'Female'}
+            <motion.div variants={cardVariants} initial="hidden" animate="visible">
+              <Card
+                elevation={6}
+                sx={{
+                  p: 3,
+                  borderRadius: '12px',
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e6f0fa',
+                  transition: 'transform 0.3s',
+                  '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
+                }}
+                className="shadow-md"
+                aria-label={`Details for ${data.first_name} ${data.last_name}`}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar
+                    sx={{ bgcolor: '#00695c', width: 60, height: 60, mr: 2 }}
+                    className="font-sans"
+                  >
+                    {data.first_name[0]}{data.last_name[0]}
+                  </Avatar>
+                  <Typography
+                    variant="h4"
+                    sx={{ color: '#1a3c34', fontWeight: 700 }}
+                    className="font-serif"
+                  >
+                    {data.first_name} {data.last_name}
                   </Typography>
-                  <Typography variant="body1">
-                    <strong>Birth Date:</strong> {new Date(data.birth_date).toLocaleDateString()}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Phone:</strong> {data.phone}
-                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: '#4b5e5a', mb: 1 }}
+                      className="font-sans"
+                    >
+                      <strong>Gender:</strong> {data.gender === 'M' ? 'Male' : data.gender === 'F' ? 'Female' : 'Other'}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: '#4b5e5a', mb: 1 }}
+                      className="font-sans"
+                    >
+                      <strong>Birth Date:</strong> {new Date(data.birth_date).toLocaleDateString()}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: '#4b5e5a' }}
+                      className="font-sans"
+                    >
+                      <strong>Phone:</strong> {data.phone}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: '#4b5e5a', mb: 1 }}
+                      className="font-sans"
+                    >
+                      <strong>Address:</strong> {data.address}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: '#6b7280' }}
+                      className="font-sans"
+                    >
+                      Record Created At: {new Date(data.created_at).toLocaleString()}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Address:</strong> {data.address}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Record Created At: {new Date(data.created_at).toLocaleString()}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Card>
+              </Card>
+            </motion.div>
           </Grid>
 
           {/* Screening Records Section */}
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 700, color: '#1a3c34', mb: 3, fontSize: { xs: '1.5rem', sm: '1.8rem' } }}
+              className="font-serif"
+              aria-label="Screening records"
+            >
               Screening Records
             </Typography>
             <Grid container spacing={3}>
               {screeningsLoading ? (
-                <Typography sx={{ p: 2 }}>Loading screenings...</Typography>
+                <Typography
+                  sx={{ p: 2, color: '#4b5e5a' }}
+                  className="font-sans"
+                  aria-label="Loading screenings"
+                >
+                  Loading screenings...
+                </Typography>
               ) : screeningsData?.length > 0 ? (
                 screeningsData.map((screening) => (
                   <Grid item xs={12} sm={6} md={4} key={screening.id}>
-                    <Card elevation={4} sx={{ height: '100%' }}>
-                      <CardMedia
-                        component="img"
-                        height="180"
-                        image={screening.image}
-                        alt="Screening"
-                      />
-                      <CardContent>
-                        <Box sx={{ mb: 1 }}>
-                          <Chip
-                            label={screening.result === 'P' ? 'Positive' : 'Negative'}
-                            color={screening.result === 'P' ? 'error' : 'success'}
-                            size="small"
-                          />
-                          <Typography variant="body2" sx={{ ml: 1 }}>
-                            {screening.confidence ? `${(screening.confidence * 100).toFixed(1)}% confidence` : ''}
+                    <motion.div variants={cardVariants} initial="hidden" animate="visible">
+                      <Card
+                        elevation={6}
+                        sx={{
+                          height: '100%',
+                          borderRadius: '12px',
+                          bgcolor: '#ffffff',
+                          border: '1px solid #e6f0fa',
+                          transition: 'transform 0.3s',
+                          '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
+                        }}
+                        className="shadow-md"
+                        aria-label={`Screening record from ${new Date(screening.created_at).toLocaleString()}`}
+                      >
+                        <CardMedia
+                          component="img"
+                          height="180"
+                          image={screening.image || '/placeholder-image.png'}
+                          alt="Screening image"
+                          sx={{ objectFit: 'cover', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+                        />
+                        <CardContent sx={{ p: 2 }}>
+                          <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Chip
+                              label={screening.result === 'P' ? 'Positive' : 'Negative'}
+                              color={screening.result === 'P' ? 'error' : 'success'}
+                              size="small"
+                              sx={{
+                                bgcolor: screening.result === 'P' ? '#d32f2f' : '#2e7d32',
+                                color: '#ffffff',
+                                fontWeight: 600
+                              }}
+                              className="font-sans"
+                              aria-label={`Result: ${screening.result === 'P' ? 'Positive' : 'Negative'}`}
+                            />
+                            <Typography
+                              variant="body2"
+                              sx={{ color: '#4b5e5a' }}
+                              className="font-sans"
+                            >
+                              {screening.confidence ? `${(screening.confidence * 100).toFixed(1)}% confidence` : ''}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: '#4b5e5a', mb: 1 }}
+                            className="font-sans"
+                          >
+                            <strong>Parasite Count:</strong> {screening.parasite_count}
                           </Typography>
-                        </Box>
-                        <Typography variant="body2">
-                          <strong>Parasite Count:</strong> {screening.parasite_count}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          <strong>Notes:</strong> {screening.notes || 'No notes provided'}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                          Date: {new Date(screening.created_at).toLocaleString()}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: '#4b5e5a', mb: 1 }}
+                            className="font-sans"
+                          >
+                            <strong>Notes:</strong> {screening.notes || 'No notes provided'}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: '#6b7280', display: 'block' }}
+                            className="font-sans"
+                          >
+                            Date: {new Date(screening.created_at).toLocaleString()}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
                   </Grid>
                 ))
               ) : (
-                <Typography sx={{ p: 2 }}>No screenings available for this patient.</Typography>
+                <Typography
+                  sx={{ p: 2, color: '#4b5e5a' }}
+                  className="font-sans"
+                  aria-label="No screenings available"
+                >
+                  No screenings available for this patient.
+                </Typography>
               )}
             </Grid>
           </Grid>
