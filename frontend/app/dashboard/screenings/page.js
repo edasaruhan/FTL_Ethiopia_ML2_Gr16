@@ -214,19 +214,19 @@ export default function ScreeningTablePage() {
             getRowId={(row) => row.id}
             disableRowSelectionOnClick
             sx={{
-              border: 'none',
-              '& .MuiDataGrid-columnHeaders': {
-                bgcolor: '#00695c',
-                color: '#e6f0fa', // Changed to off-white for visibility
-                fontWeight: 600,
-                borderBottom: '1px solid #e6f0fa',
-              },
-              '& .MuiDataGrid-columnHeaderTitle': {
-                color: '#e6f0fa', // Explicitly set title color
-                fontSize: '1rem',
-                fontWeight: 600,
-                fontFamily: '"Inter", sans-serif',
-              },
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: '#00695c', // primary color, no opacity
+                  color: '#e6f0fa',    // white text for high contrast
+                  fontWeight: 600,
+                  borderBottom: '1px solid #e6f0fa',
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: '#000000', // white for full visibility
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  fontFamily: '"Inter", sans-serif',
+                },
               '& .MuiDataGrid-cell': {
                 color: '#4b5e5a',
                 fontSize: '0.9rem',
