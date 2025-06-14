@@ -1,4 +1,3 @@
-// components/ScreeningStats.js
 'use client'
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
@@ -220,26 +219,26 @@ export default function ScreeningStats() {
             </motion.div>
           </Grid>
         ))}
-        <Grid item xs={12}>
-          <motion.div variants={cardVariants} initial="hidden" animate="visible">
-            <Card
-              elevation={6}
-              sx={{
-                height: 300,
-                p: 3,
-                borderRadius: '12px',
-                bgcolor: '#ffffff',
-                transition: 'transform 0.3s',
-                '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
-              }}
-              className="shadow-md"
-              aria-label="Weekly screening trend chart"
-            >
-              <Bar data={chartData} options={chartOptions} />
-            </Card>
-          </motion.div>
-        </Grid>
       </Grid>
+      <Box sx={{ mt: 4, width: '100%' }}>
+        <motion.div variants={cardVariants} initial="hidden" animate="visible">
+          <Card
+            elevation={6}
+            sx={{
+              height: 400, // Taller for full-width display
+              p: 3,
+              borderRadius: '12px',
+              bgcolor: '#ffffff',
+              transition: 'transform 0.3s',
+              '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }
+            }}
+            className="shadow-md"
+            aria-label="Weekly screening trend chart"
+          >
+            <Bar data={chartData} options={chartOptions} />
+          </Card>
+        </motion.div>
+      </Box>
     </Box>
   )
 }

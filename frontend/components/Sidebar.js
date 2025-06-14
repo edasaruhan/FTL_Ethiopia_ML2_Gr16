@@ -1,137 +1,121 @@
-//  components/Sidebar.js
-
 'use client'
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Divider, Typography, Box } from '@mui/material'
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'
+import { useState } from 'react'
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Divider,
+  Box,
+  Typography
+} from '@mui/material'
+import { usePathname, useRouter } from 'next/navigation'
+import MenuIcon from '@mui/icons-material/Menu'
+import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
-import AssessmentIcon from '@mui/icons-material/Assessment'
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'
 
-const drawerWidth = 240
+export default function Sidebar() {
+  const pathname = usePathname()
+  const router = useRouter()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-export default function Sidebar({ mobileOpen, handleDrawerToggle }) {
-  // Animation variants
-  const drawerVariants = {
-    open: { x: 0, opacity: 1, transition: { duration: 0.3 } },
-    closed: { x: -drawerWidth, opacity: 0, transition: { duration: 0.3 } }
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen)
   }
 
-  const itemVariants = {
-    hover: { scale: 1.05, backgroundColor: '#e6f0fa', transition: { duration: 0.2 } }
-  }
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Patients', icon: <PeopleIcon />, path: '/dashboard/patients' },
+    { text: 'Screenings', icon: <HealthAndSafetyIcon />, path: '/dashboard/screenings' },
+  ]
 
   const drawerContent = (
-    <>
-      <Toolbar sx={{ bgcolor: '#00695c', color: '#e6f0fa', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <HealthAndSafetyIcon sx={{ fontSize: 28 }} />
+    <Box sx={{ bgcolor: '#1a3c34', height: '100%', color: '#e6f0fa' }}>
+      <Box sx={{ p: 2, textAlign: 'center' }}>
         <Typography
           variant="h6"
-          sx={{ fontWeight: 700, fontSize: '1.2rem' }}
+          sx={{ color: '#e6f0fa', fontWeight: 700 }}
           className="font-serif"
         >
-          Malaria Diagnosis
+          Malaria Dashboard
         </Typography>
-      </Toolbar>
-      <Divider sx={{ borderColor: '#e6f0fa' }} />
-      <List sx={{ p: 1 }}>
-        <Link href="/dashboard" passHref legacyBehavior>
-          <motion.div whileHover="hover" variants={itemVariants}>
-            <ListItem
-              button
-              component="a"
-              sx={{
-                borderRadius: '8px',
-                mb: 1,
-                color: '#1a3c34',
-                '&:hover': { color: '#00695c' }
+      </Box>
+      <Divider sx={{ bgcolor: '#00695c' }} />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                router.push(item.path)
+                setMobileOpen(false)
               }}
-              aria-label="Patients page"
-              className="font-sans"
-            >
-              <ListItemIcon sx={{ color: '#00695c', minWidth: 40 }}>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Patients" primaryTypographyProps={{ fontSize: '1rem' }} />
-            </ListItem>
-          </motion.div>
-        </Link>
-        <Link href="/dashboard/screenings" passHref legacyBehavior>
-          <motion.div whileHover="hover" variants={itemVariants}>
-            <ListItem
-              button
-              component="a"
               sx={{
-                borderRadius: '8px',
-                mb: 1,
-                color: '#1a3c34',
-                '&:hover': { color: '#00695c' }
+                bgcolor: pathname === item.path ? '#00695c' : 'transparent',
+                color: pathname === item.path ? '#e6f0fa' : '#b2dfdb',
+                '&:hover': {
+                  bgcolor: '#00695c',
+                  color: '#e6f0fa',
+                  transform: 'translateX(5px)',
+                  transition: 'all 0.3s'
+                },
+                py: 1.5,
+                px: 3
               }}
-              aria-label="Screenings page"
               className="font-sans"
+              aria-label={`Navigate to ${item.text}`}
             >
-              <ListItemIcon sx={{ color: '#00695c', minWidth: 40 }}>
-                <AssessmentIcon />
+              <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                {item.icon}
               </ListItemIcon>
-              <ListItemText primary="Screenings" primaryTypographyProps={{ fontSize: '1rem' }} />
-            </ListItem>
-          </motion.div>
-        </Link>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
-    </>
+    </Box>
   )
 
   return (
     <>
-      {/* Mobile Drawer */}
-      <motion.div
-        variants={drawerVariants}
-        animate={mobileOpen ? 'open' : 'closed'}
-        initial="closed"
+      <IconButton
+        color="inherit"
+        aria-label="Open sidebar"
+        edge="start"
+        onClick={handleDrawerToggle}
+        sx={{ display: { sm: 'none' }, color: '#00695c', m: 1 }}
       >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              bgcolor: '#ffffff',
-              borderRight: '1px solid #e6f0fa'
-            }
-          }}
-          className="shadow-md"
-        >
-          {drawerContent}
-        </Drawer>
-      </motion.div>
-
-      {/* Desktop Drawer */}
-      <motion.div
-        variants={drawerVariants}
-        initial="open"
-        animate="open"
+        <MenuIcon />
+      </IconButton>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': { width: 240, bgcolor: '#1a3c34' }
+        }}
       >
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              bgcolor: '#ffffff',
-              borderRight: '1px solid #e6f0fa'
-            }
-          }}
-          open
-          className="shadow-md"
-        >
-          {drawerContent}
-        </Drawer>
-      </motion.div>
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', sm: 'block' },
+          '& .MuiDrawer-paper': {
+            width: 240,
+            bgcolor: '#1a3c34',
+            borderRight: '1px solid #00695c'
+          }
+        }}
+        open
+      >
+        {drawerContent}
+      </Drawer>
     </>
   )
 }

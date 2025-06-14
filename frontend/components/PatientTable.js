@@ -1,15 +1,27 @@
-//  components/PatientTable.js
 'use client'
-import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
+import {
+  Paper,
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Snackbar,
+  Alert
+} from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import { Paper, IconButton, Tooltip, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, Snackbar, Alert } from '@mui/material'
 import { motion } from 'framer-motion'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
-import ScreeningUpload from './ScreeningUpload'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import ScreeningUpload from './ScreeningUpload'
 
 export default function PatientTable() {
   const router = useRouter()
@@ -62,55 +74,69 @@ export default function PatientTable() {
   const columns = [
     {
       field: 'id',
-      headerName: 'Patient ID',
-      width: 120,
-      renderCell: (params) => `PID-${params.row.id}`,
+      headerName: 'ID',
+      width: 90,
+      renderCell: (params) => `P-${params.row.id}`,
       headerClassName: 'font-sans',
     },
-    { field: 'first_name', headerName: 'First Name', flex: 1, headerClassName: 'font-sans' },
-    { field: 'last_name', headerName: 'Last Name', flex: 1, headerClassName: 'font-sans' },
-    { field: 'gender', headerName: 'Gender', width: 100, headerClassName: 'font-sans' },
-    { field: 'phone', headerName: 'Phone', flex: 1, headerClassName: 'font-sans' },
+    {
+      field: 'first_name',
+      headerName: 'First Name',
+      flex: 1,
+      headerClassName: 'font-sans',
+    },
+    {
+      field: 'last_name',
+      headerName: 'Last Name',
+      flex: 1,
+      headerClassName: 'font-sans',
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      width: 120,
+      renderCell: (params) => (
+        <span>{params.value === 'M' ? 'Male' : params.value === 'F' ? 'Female' : 'Other'}</span>
+      ),
+      headerClassName: 'font-sans',
+    },
+    {
+      field: 'birth_date',
+      headerName: 'Birth Date',
+      flex: 1,
+      renderCell: (params) => (
+        <span>{new Date(params.value).toLocaleDateString()}</span>
+      ),
+      headerClassName: 'font-sans',
+    },
+    {
+      field: 'phone',
+      headerName: 'Phone',
+      flex: 1,
+      headerClassName: 'font-sans',
+    },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 220,
+      width: 200,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ScreeningUpload
-            patientId={params.row.id}
-            sx={{
-              bgcolor: '#00695c',
-              color: '#e6f0fa',
-              borderRadius: '8px',
-              px: 2,
-              py: 0.5,
-              textTransform: 'none',
-              '&:hover': { bgcolor: '#00897b', transform: 'scale(1.05)', transition: 'all 0.3s' }
-            }}
-            className="font-sans shadow-sm"
-          />
           <Tooltip title="View Patient">
             <IconButton
               onClick={() => handleView(params.row.id)}
-              sx={{
-                color: '#00695c',
-                '&:hover': { bgcolor: '#e6f0fa', transform: 'scale(1.1)', transition: 'all 0.3s' }
-              }}
+              sx={{ color: '#00695c', '&:hover': { bgcolor: '#e6f0fa', transform: 'scale(1.1)' } }}
               aria-label={`View patient ${params.row.id}`}
             >
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
+          <ScreeningUpload patientId={params.row.id} />
           <Tooltip title="Delete Patient">
             <IconButton
               onClick={() => handleDelete(params.row.id)}
-              sx={{
-                color: '#d32f2f',
-                '&:hover': { bgcolor: '#ffebee', transform: 'scale(1.1)', transition: 'all 0.3s' }
-              }}
+              sx={{ color: '#d32f2f', '&:hover': { bgcolor: '#ffebee', transform: 'scale(1.1)' } }}
               aria-label={`Delete patient ${params.row.id}`}
             >
               <DeleteIcon />
@@ -129,7 +155,7 @@ export default function PatientTable() {
   }
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+    <Box sx={{ width: '100%', maxWidth: '100%' }}>
       <Typography
         variant="h5"
         sx={{ fontWeight: 700, color: '#1a3c34', mb: 3, fontSize: { xs: '1.5rem', sm: '1.8rem' } }}
@@ -143,6 +169,7 @@ export default function PatientTable() {
           elevation={6}
           sx={{
             width: '100%',
+            maxWidth: '100%',
             height: 600,
             borderRadius: '12px',
             bgcolor: '#ffffff',
@@ -158,17 +185,19 @@ export default function PatientTable() {
             columns={columns}
             loading={isLoading}
             pageSizeOptions={[10, 25, 50]}
+            getRowId={(row) => row.id}
             disableRowSelectionOnClick
             sx={{
               border: 'none',
+              width: '100%',
               '& .MuiDataGrid-columnHeaders': {
                 bgcolor: '#00695c',
-                color: '#000000', // High-contrast white for visibility
+                color: '#e6f0fa',
                 fontWeight: 600,
                 borderBottom: '1px solid #e6f0fa',
               },
               '& .MuiDataGrid-columnHeaderTitle': {
-                color: '#ffffff', // Explicitly set title color
+                color: '#000000',
                 fontSize: '1rem',
                 fontWeight: 600,
                 fontFamily: '"Inter", sans-serif',
@@ -214,6 +243,7 @@ export default function PatientTable() {
           }
         }}
         className="shadow-xl"
+        aria-label="Confirm patient deletion dialog"
       >
         <DialogTitle
           sx={{ bgcolor: '#00695c', color: '#e6f0fa', fontWeight: 700, fontSize: '1.5rem' }}
@@ -273,6 +303,7 @@ export default function PatientTable() {
           severity={snackbar.severity}
           sx={{ width: '100%', borderRadius: '8px' }}
           className="font-sans"
+          aria-label={snackbar.severity === 'success' ? 'Success message' : 'Error message'}
         >
           {snackbar.message}
         </Alert>

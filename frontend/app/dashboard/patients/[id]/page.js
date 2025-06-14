@@ -156,7 +156,7 @@ export default function PatientDetailPage() {
             >
               Screening Records
             </Typography>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ width: '100%' }}>
               {screeningsLoading ? (
                 <Typography
                   sx={{ p: 2, color: '#4b5e5a' }}
