@@ -17,6 +17,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'
+import ChatIcon from '@mui/icons-material/Chat'
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -31,6 +32,7 @@ export default function Sidebar() {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Patients', icon: <PeopleIcon />, path: '/dashboard/patients' },
     { text: 'Screenings', icon: <HealthAndSafetyIcon />, path: '/dashboard/screenings' },
+    { text: 'Malaria Chatbot', icon: <ChatIcon />, path: '/dashboard/chatbot' },
   ]
 
   const drawerContent = (
