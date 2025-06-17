@@ -8,11 +8,11 @@ import theme from '../styles/theme'
 
 const queryClient = new QueryClient()
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider> {/* Moved to be the outermost provider */}
+        <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <ThemeProvider theme={theme}>
               {children}
