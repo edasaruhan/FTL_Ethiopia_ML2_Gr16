@@ -14,6 +14,11 @@ const drawerWidth = 240
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(prev => !prev)
+  }
 
   const toggleChatbot = () => {
     setIsChatbotOpen(prev => !prev)
@@ -23,8 +28,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ProtectedRoute>
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5' }}>
         <CssBaseline />
-        <Navbar />
-        <Sidebar />
+        <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
+        <Sidebar  />
         <Box
           component="main"
           sx={{
@@ -37,7 +42,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           <Toolbar />
           {children}
-
           {/* Blinking Floating Button */}
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
@@ -53,7 +57,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <ChatIcon sx={{ color: '#e6f0fa' }} />
             </Fab>
           </motion.div>
-
           {/* Chatbot Dialog */}
           {isChatbotOpen && (
             <MalariaChatbotDialog open={isChatbotOpen} onClose={toggleChatbot} />
